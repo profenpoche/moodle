@@ -1235,9 +1235,11 @@ class restore_groups_structure_step extends restore_structure_step {
      */
     public function process_groupcustomfield($data) {
         $newgroup = $this->get_mapping('group', $data['groupid']);
-        $data['groupid'] = $newgroup->newitemid ?? $data['groupid'];
-        $handler = \core_group\customfield\group_handler::create();
-        $handler->restore_instance_data_from_backup($this->task, $data);
+        if ($newgroup && $newgroup->newitemid) {
+            $data['groupid'] = $newgroup->newitemid;
+            $handler = \core_group\customfield\group_handler::create();
+            $handler->restore_instance_data_from_backup($this->task, $data);
+        }
     }
 
     public function process_grouping($data) {
@@ -1291,10 +1293,12 @@ class restore_groups_structure_step extends restore_structure_step {
      * @return void
      */
     public function process_groupingcustomfield($data) {
-        $newgroup = $this->get_mapping('grouping', $data['groupingid']);
-        $data['groupingid'] = $newgroup->newitemid ?? $data['groupingid'];
-        $handler = \core_group\customfield\grouping_handler::create();
-        $handler->restore_instance_data_from_backup($this->task, $data);
+        $newgrouping = $this->get_mapping('grouping', $data['groupingid']);
+        if ($newgrouping && $newgrouping->newitemid) {
+            $data['groupingid'] = $newgrouping->newitemid;
+            $handler = \core_group\customfield\grouping_handler::create();
+            $handler->restore_instance_data_from_backup($this->task, $data);
+        }
     }
 
     public function process_grouping_group($data) {
@@ -1629,8 +1633,11 @@ class restore_section_structure_step extends restore_structure_step {
                             $data, true);
                 }
             }
-            $section->component = $data->component ?? null;
-            $section->itemid = $data->itemid ?? null;
+            // Moodle 4.4 implement basic delegated section logic but it is not able to restore
+            // them from a backup. To prevent unexpected retoration errors, all sections with
+            // a component will be restored as a normal section.
+            $section->component = null;
+            $section->itemid = null;
             $newitemid = $DB->insert_record('course_sections', $section);
             $section->id = $newitemid;
 
