@@ -53,6 +53,7 @@ moodle-plugin-ci.phar
 .eslintignore
 .stylelintignore
 /jsdoc
+/admin/tool/log/store
 /admin/tool/componentlibrary/docs
 /admin/tool/componentlibrary/hugo/site/data/my-index.json
 .hugo_build.lock
