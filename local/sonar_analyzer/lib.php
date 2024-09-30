@@ -74,7 +74,9 @@ class SonarAnalyzer
         $sonnarScannerLocation = "/opt/sonar-scanner/bin/sonar-scanner";
         //  $command = "/opt/sonar-scanner/bin/sonar-scanner   -Dsonar.projectKey=Verdinum   -Dsonar.sources=.   -Dsonar.host.url=http://188.165.255.153:9000   -Dsonar.login=squ_2272b4885731970e18acb36f91e90591f422fa56"
         // $command = "$sonnarScannerLocation -Dsonar.projectKey={$config->projectKey} -Dsonar.sources=$filePath -Dsonar.host.url=http://188.165.255.153:9000 -Dsonar.login={$config->token}";
-        $command = "$sonnarScannerLocation -Dsonar.projectKey={$this->config->projectKey} -Dsonar.sources={$this->filePath} -Dsonar.host.url=http://188.165.255.153:9000 -Dsonar.login={$this->config->token}  -Dsonar.projectBaseDir=/var/www/moodledata/temp/files/";
+        // $command = "$sonnarScannerLocation -Dsonar.projectKey={$this->config->projectKey} -Dsonar.sources={$this->filePath} -Dsonar.host.url=http://188.165.255.153:9000 -Dsonar.login={$this->config->token}  -Dsonar.projectBaseDir=/var/www/moodledata/temp/files/";
+        // $command = "$sonnarScannerLocation -Dsonar.projectKey={$this->config->projectKey} -Dsonar.sources={$this->filePath} -Dsonar.host.url=http://188.165.255.153:9000 -Dsonar.login={$this->config->token}  -Dsonar.projectBaseDir=/var/www/moodledata/temp/files/";
+        $command = "$sonnarScannerLocation -Dsonar.projectKey={$this->config->projectKey} -Dsonar.sources={$this->filePath} -Dsonar.host.url=http://188.165.255.153:9000 -Dsonar.login={$this->config->token}  -Dsonar.projectBaseDir=/home/verdinum/moodledata/temp/files/";
         exec($command, $output, $return_var);
 
         if ($return_var === 0) {
