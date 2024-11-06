@@ -28,4 +28,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-echo $OUTPUT->columns_one_layout();
+$plugin->version = 2024100700; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires = 2024100100; // Requires this Moodle version.
+$plugin->component = 'logstore_standard'; // Full name of the plugin (used for diagnostics).

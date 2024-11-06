@@ -39,7 +39,7 @@ function xmldb_qbank_columnsortorder_upgrade(int $oldversion): bool {
         // In Moodle 4.3, the values are stored as qbank_statistics\columns\discriminative_efficiency-discriminative_efficiency.
         // So updating the old values to match the new format.
         // Update the columns records for qbank_columnsortorder plugin.
-        $pluginconfigs = $DB->get_records('config_plugins', ['plugin' => 'qbank_columnsortorder'], 'name, value');
+        $pluginconfigs = $DB->get_records('config_plugins', ['plugin' => 'qbank_columnsortorder'], 'name');
 
         foreach ($pluginconfigs as $config) {
             if ($config->name == 'version') {
@@ -71,11 +71,14 @@ function xmldb_qbank_columnsortorder_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2024042201, 'qbank', 'columnsortorder');
     }
 
-    if ($oldversion < 2024042202) {
+    if ($oldversion < 2024051000) {
         // Remove plugin entry created by previously incorrect 2024042201 savepoint.
         $DB->delete_records('config_plugins', ['plugin' => 'qbank_qbank_columnsortorder']);
-        upgrade_plugin_savepoint(true, 2024042202, 'qbank', 'columnsortorder');
+        upgrade_plugin_savepoint(true, 2024051000, 'qbank', 'columnsortorder');
     }
+
+    // Automatically generated Moodle v4.5.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

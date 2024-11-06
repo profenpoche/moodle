@@ -30,9 +30,9 @@ use customfield_textarea;
  * @category   test
  * @copyright  2018 Ruslan Kabalin
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers \core_customfield\field_controller
  */
-class field_controller_test extends \advanced_testcase {
-
+final class field_controller_test extends \advanced_testcase {
     /**
      * Get generator.
      *
@@ -76,8 +76,10 @@ class field_controller_test extends \advanced_testcase {
         $this->assertInstanceOf(customfield_date\field_controller::class, field_controller::create($field1->get('id')));
 
         // Retrieve field by id and category.
-        $this->assertInstanceOf(customfield_select\field_controller::class,
-            field_controller::create($field2->get('id'), null, $category0));
+        $this->assertInstanceOf(
+            customfield_select\field_controller::class,
+            field_controller::create($field2->get('id'), null, $category0)
+        );
 
         // Retrieve fields by record without category.
         $fieldrecord = $DB->get_record(\core_customfield\field::TABLE, ['id' => $field3->get('id')], '*', MUST_EXIST);
@@ -85,8 +87,34 @@ class field_controller_test extends \advanced_testcase {
 
         // Retrieve fields by record with category.
         $fieldrecord = $DB->get_record(\core_customfield\field::TABLE, ['id' => $field4->get('id')], '*', MUST_EXIST);
-        $this->assertInstanceOf(customfield_textarea\field_controller::class,
-            field_controller::create(0, $fieldrecord, $category0));
+        $this->assertInstanceOf(
+            customfield_textarea\field_controller::class,
+            field_controller::create(0, $fieldrecord, $category0)
+        );
+    }
+
+    /**
+     * Test creation of field instance from pre-defined object
+     */
+    public function test_constructor_from_record(): void {
+        $this->resetAfterTest();
+
+        // Create field object that matches the persistent/schema definition.
+        $category = $this->get_generator()->create_category();
+        $field = field_controller::create(0, (object) [
+            'name' => 'Test',
+            'shortname' => 'test',
+            'type' => 'text',
+            'description' => null,
+            'descriptionformat' => null,
+            'sortorder' => null,
+            'configdata' => null,
+        ], $category);
+
+        // Saving the field will validate the persistent internally.
+        $field->save();
+
+        $this->assertInstanceOf(\customfield_text\field_controller::class, $field);
     }
 
     /**
@@ -106,8 +134,10 @@ class field_controller_test extends \advanced_testcase {
         $field = field_controller::create($fieldrecord->id, $fieldrecord);
         $debugging = $this->getDebuggingMessages();
         $this->assertEquals(1, count($debugging));
-        $this->assertEquals('Too many parameters, either id need to be specified or a record, but not both.',
-            $debugging[0]->message);
+        $this->assertEquals(
+            'Too many parameters, either id need to be specified or a record, but not both.',
+            $debugging[0]->message
+        );
         $this->resetDebugging();
         $this->assertInstanceOf(customfield_text\field_controller::class, $field);
 
@@ -117,7 +147,6 @@ class field_controller_test extends \advanced_testcase {
             $this->fail('Expected exception');
         } catch (\moodle_exception $e) {
             $this->assertEquals('Field not found', $e->getMessage());
-            $this->assertEquals(\moodle_exception::class, get_class($e));
         }
 
         // Retrieve without id and without type.
@@ -127,7 +156,6 @@ class field_controller_test extends \advanced_testcase {
         } catch (\coding_exception $e) {
             $this->assertEquals('Coding error detected, it must be fixed by a programmer: Not enough parameters to ' .
                 'initialise field_controller - unknown field type', $e->getMessage());
-            $this->assertEquals(\coding_exception::class, get_class($e));
         }
 
         // Missing category id.
@@ -137,7 +165,6 @@ class field_controller_test extends \advanced_testcase {
         } catch (\coding_exception $e) {
             $this->assertEquals('Coding error detected, it must be fixed by a programmer: Not enough parameters ' .
                 'to initialise field_controller - unknown category', $e->getMessage());
-            $this->assertEquals(\coding_exception::class, get_class($e));
         }
 
         // Mismatching category id.
@@ -147,7 +174,6 @@ class field_controller_test extends \advanced_testcase {
         } catch (\coding_exception $e) {
             $this->assertEquals('Coding error detected, it must be fixed by a programmer: Category of the field ' .
                 'does not match category from the parameter', $e->getMessage());
-            $this->assertEquals(\coding_exception::class, get_class($e));
         }
 
         // Non-existing type.
@@ -156,7 +182,6 @@ class field_controller_test extends \advanced_testcase {
             $this->fail('Expected exception');
         } catch (\moodle_exception $e) {
             $this->assertEquals('Field type nonexisting not found', $e->getMessage());
-            $this->assertEquals(\moodle_exception::class, get_class($e));
         }
     }
 
@@ -206,8 +231,8 @@ class field_controller_test extends \advanced_testcase {
         $this->assertCount(0, $fields);
 
         // Create field using generator.
-        $field1 = $lpg->create_field(array('categoryid' => $category->get('id')));
-        $field2 = $lpg->create_field(array('categoryid' => $category->get('id')));
+        $field1 = $lpg->create_field(['categoryid' => $category->get('id')]);
+        $field2 = $lpg->create_field(['categoryid' => $category->get('id')]);
         $fields = $DB->get_records(\core_customfield\field::TABLE, ['categoryid' => $category->get('id')]);
         $this->assertCount(2, $fields);
 

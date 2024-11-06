@@ -58,3 +58,4 @@ moodle-plugin-ci.phar
 .hugo_build.lock
 phpcs.xml
 jsconfig.json
+UPGRADING-CURRENT.md

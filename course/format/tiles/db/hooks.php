@@ -24,15 +24,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$callbacks = [
-    [
-        'hook' => \core\hook\output\before_standard_head_html_generation::class,
-        'callback' => 'format_tiles\hooks\output\standard_head_html_prepend::callback',
-        'priority' => 0,
-    ],
-    [
-        'hook' => \core\hook\output\before_footer_html_generation::class,
-        'callback' => 'format_tiles\hooks\output\before_footer_html_generation::callback',
-        'priority' => 0,
-    ],
-];
+    // Automatically generated Moodle v4.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.4.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.5.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    return true;
+}

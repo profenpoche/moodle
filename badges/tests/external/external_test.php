@@ -63,6 +63,7 @@ class external_test extends externallib_advanced_testcase {
      */
     public function setUp(): void {
         global $DB;
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -207,6 +208,10 @@ class external_test extends externallib_advanced_testcase {
                     $badge->relatedbadges[] = (array) $relatedbadge;
                 }
             }
+
+            // Add recipient.
+            $badge->recipientid = $this->student->id;
+            $badge->recipientfullname = fullname($this->student);
 
             $expectedbadges[] = (array) $badge;
             if (isset($badge->courseid)) {
