@@ -23,6 +23,7 @@ use context_system;
 use context_user;
 use core\context;
 use core_component;
+use core_date;
 use html_writer;
 use lang_string;
 use moodle_url;
@@ -281,11 +282,8 @@ class user extends base {
         ))
             ->add_joins($this->get_joins())
             ->add_fields($userpictureselect)
-            ->set_type(column::TYPE_INTEGER)
             ->set_is_sortable($this->is_sortable('picture'))
-            // It doesn't make sense to offer integer aggregation methods for this column.
-            ->set_disabled_aggregation(['avg', 'max', 'min', 'sum'])
-            ->add_callback(static function ($value, stdClass $row): string {
+            ->add_callback(static function($value, stdClass $row): string {
                 global $OUTPUT;
 
                 return !empty($row->id) ? $OUTPUT->user_picture($row, ['link' => false, 'alttext' => false]) : '';
@@ -429,6 +427,8 @@ class user extends base {
             'email' => new lang_string('email'),
             'city' => new lang_string('city'),
             'country' => new lang_string('country'),
+            'lang' => new lang_string('language'),
+            'timezone' => new lang_string('timezone'),
             'theme' => new lang_string('theme'),
             'description' => new lang_string('description'),
             'firstnamephonetic' => new lang_string('firstnamephonetic'),
@@ -594,6 +594,24 @@ class user extends base {
      */
     public static function get_options_for_country(): array {
         return get_string_manager()->get_list_of_countries();
+    }
+
+    /**
+     * List of options for the field lang.
+     *
+     * @return string[]
+     */
+    public static function get_options_for_lang(): array {
+        return get_string_manager()->get_list_of_translations();
+    }
+
+    /**
+     * List of options for the field timezone.
+     *
+     * @return string[]
+     */
+    public static function get_options_for_timezone(): array {
+        return core_date::get_list_of_timezones(null, true);
     }
 
     /**

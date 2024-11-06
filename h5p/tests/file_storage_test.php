@@ -33,6 +33,7 @@ use zip_archive;
  * @copyright  2019 Victor Deniz <victor@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
+ * @covers \core_h5p\file_storage
  */
 class file_storage_test extends \advanced_testcase {
 
@@ -475,7 +476,7 @@ class file_storage_test extends \advanced_testcase {
     public function test_saveFileFromZip(): void {
 
         $ziparchive = new zip_archive();
-        $path = __DIR__ . '/fixtures/h5ptest.zip';
+        $path = self::get_fixture_path(__NAMESPACE__, 'h5ptest.zip');
         $result = $ziparchive->open($path, file_archive::OPEN);
 
         $files = $ziparchive->list_files();
@@ -562,7 +563,7 @@ class file_storage_test extends \advanced_testcase {
         $admin = get_admin();
 
         // Prepare a valid .H5P file.
-        $path = __DIR__ . '/fixtures/'.$filename;
+        $path = self::get_fixture_path(__NAMESPACE__, $filename);
 
         // Libraries can be updated when the file has been created by admin, even when the current user is not the admin.
         $this->setUser($admin);
@@ -847,8 +848,6 @@ class file_storage_test extends \advanced_testcase {
 
     /**
      * Test H5P custom styles generation.
-     *
-     * @covers ::generate_custom_styles
      */
     public function test_generate_custom_styles(): void {
         \set_config('h5pcustomcss', '.debug { color: #fab; }', 'core_h5p');
@@ -895,8 +894,6 @@ class file_storage_test extends \advanced_testcase {
 
     /**
      * Test H5P custom styles retrieval.
-     *
-     * @covers ::get_custom_styles
      */
     public function test_get_custom_styles(): void {
         global $CFG;

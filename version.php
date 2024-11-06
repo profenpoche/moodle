@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * MOODLE VERSION INFORMATION
+ * MOODLE VERSION INFORMATION.
  *
  * This file defines the current version of the core Moodle code being used.
  * This is compared against the values stored in the database to determine
@@ -29,9 +29,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$version  = 2024042203.01;              // 20240422      = branching date YYYYMMDD - do not modify!
+$version  = 2024100700.04;              // 20241007      = branching date YYYYMMDD - do not modify!
                                         //         RR    = release increments - 00 in DEV branches.
                                         //           .XX = incremental changes.
-$release  = '4.4.3+ (Build: 20240903)'; // Human-friendly version name
-$branch   = '404';                     // This version's branch.
-$maturity = MATURITY_STABLE;             // This version's maturity level.
+$release  = '4.5+ (Build: 20241101)';    // Human-friendly version name
+$branch   = '405';                      // This version's branch.
+$maturity = MATURITY_STABLE;            // This version's maturity level.
