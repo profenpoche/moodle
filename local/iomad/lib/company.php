@@ -2488,17 +2488,20 @@ class company {
 
         // We need the company.
         $departmentrec = $DB->get_record('department', array('id' => $departmentid));
-
         // Moving a user.
         if ($currentuser = $DB->get_record('company_users', array('userid' => $userid, 'companyid' => $departmentrec->company))) {
             $currentuser->departmentid = $departmentid;
             if ($ws && !empty($managertype)) {
                 $currentuser->managertype = $managertype;
             }
-            if (!$DB->update_record('company_users', $currentuser)) {
-                if ($ws) {
-                    return false;
-                } else {
+            error_log("can't update department users db 111111 " . json_encode($currentuser));
+            if (!$DB->record_exists('company_users', array(
+                'companyid' => $currentuser->companyid,
+                'userid' => $currentuser->userid,
+                'departmentid' => $currentuser->departmentid
+            ))) {
+                // Met à jour si aucune violation d'unicité.
+                if (!$DB->update_record('company_users', $currentuser)) {
                     throw new moodle_exception(get_string('cantupdatedepartmentusersdb', 'block_iomad_company_admin'));
                 }
             }

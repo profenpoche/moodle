@@ -92,9 +92,6 @@ if ($mform->is_cancelled()) {
     $data->lastname = trim($data->lastname);
 
     $data->userid = $USER->id;
-    if ($companyid > 0) {
-        $data->companyid = $companyid;
-    }
 
     if (!$userid = company_user::create($data, $companyid)) {
         $this->verbose("Error inserting a new user in the database!");
@@ -105,16 +102,13 @@ if ($mform->is_cancelled()) {
     $user = new stdclass();
     $user->id = $userid;
     $data->id = $userid;
-
     // Save custom profile fields data.
     profile_save_data($data);
     \core\event\user_updated::create_from_userid($userid)->trigger();
-
     // Check if we are assigning a different role to the user.
-    if (!empty($data->managertype || !empty($data->educator))) {
+    if (!empty($data->managertype || !empty($data->educator)) && $data->parent != 0) {
         company::upsert_company_user($userid, $companyid, $data->deptid, $data->managertype, $data->educator);
     }
-
     // Assign the user to the default company department.
     $parentnode = company::get_company_parentnode($companyid);
     if (iomad::has_capability('block/iomad_company_admin:edit_all_departments', $companycontext)) {
