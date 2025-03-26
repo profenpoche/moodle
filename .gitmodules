@@ -2,5 +2,5 @@
 	path = local/plugin_iacdp
 	url = ssh://frif@pieber.fr/home/frif/iacdp_plugin_moodle.git
 [submodule "theme/theme_iacdp"]
-	path = theme/theme_iacdp
+	path = theme/iacdp
 	url = ssh://frif@pieber.fr/home/frif/iacdp_theme_moodle.git
