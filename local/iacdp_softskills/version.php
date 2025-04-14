@@ -23,6 +23,6 @@
  */
 
 $plugin->release  = '4.3.8 (Build: 20241007)'; // Human-friendly version name
-$plugin->version  = 2025032825;   // The (date) version of this plugin.
+$plugin->version  = 2025032827;   // The (date) version of this plugin.
 $plugin->requires = 2024100100;   // Requires this Moodle version.
 $plugin->component  = 'local_iacdp_softskills';
