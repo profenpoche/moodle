@@ -78,7 +78,7 @@ class behat_general extends behat_base {
      * @Given /^I am on homepage$/
      */
     public function i_am_on_homepage() {
-        $this->execute('behat_general::i_visit', ['/']);
+        $this->execute([self::class, 'i_visit'], ['/']);
     }
 
     /**
@@ -87,7 +87,7 @@ class behat_general extends behat_base {
      * @Given /^I am on site homepage$/
      */
     public function i_am_on_site_homepage() {
-        $this->execute('behat_general::i_visit', ['/?redirect=0']);
+        $this->execute([self::class, 'i_visit'], ['/?redirect=0']);
     }
 
     /**
@@ -96,7 +96,27 @@ class behat_general extends behat_base {
      * @Given /^I am on course index$/
      */
     public function i_am_on_course_index() {
-        $this->execute('behat_general::i_visit', ['/course/index.php']);
+        $this->execute([self::class, 'i_visit'], ['/course/index.php']);
+    }
+
+    /**
+     * Checks, that current page PATH matches regular expression
+     *
+     * Example: Then the url should match "/course/index\.php"
+     * Example: Then the url should match "/mod/forum/view\.php\?id=[0-9]+"
+     * Example: And the url should match "^http://moodle\.org"
+     *
+     * @Then /^the url should match (?P<pattern>"(?:[^"]|\\")*")$/
+     * @param string $pattern The pattern that must match to the current url.
+     */
+    public function the_url_should_match($pattern) {
+        $url = $this->getSession()->getCurrentUrl();
+
+        if (preg_match($pattern, $url) === 1) {
+            return;
+        }
+
+        throw new ExpectationException(sprintf('The url "%s" should match with %s', $url, $pattern), $this->getSession());
     }
 
     /**
@@ -462,7 +482,7 @@ class behat_general extends behat_base {
      */
     public function i_click_on_confirming_the_dialogue($element, $selectortype) {
         $this->i_click_on($element, $selectortype);
-        $this->execute('behat_general::accept_currently_displayed_alert_dialog', []);
+        $this->execute([self::class, 'accept_currently_displayed_alert_dialog'], []);
         $this->wait_until_the_page_is_ready();
     }
 
@@ -476,7 +496,7 @@ class behat_general extends behat_base {
      */
     public function i_click_on_dismissing_the_dialogue($element, $selectortype) {
         $this->i_click_on($element, $selectortype);
-        $this->execute('behat_general::dismiss_currently_displayed_alert_dialog', []);
+        $this->execute([self::class, 'dismiss_currently_displayed_alert_dialog'], []);
         $this->wait_until_the_page_is_ready();
     }
 
@@ -1165,7 +1185,7 @@ EOF;
      * @Given /^I trigger cron$/
      */
     public function i_trigger_cron() {
-        $this->execute('behat_general::i_visit', ['/admin/cron.php']);
+        $this->execute([self::class, 'i_visit'], ['/admin/cron.php']);
     }
 
     /**
@@ -2151,12 +2171,12 @@ EOF;
         }
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
-        $this->execute('behat_general::i_click_on', [$node, 'NodeElement']);
-        $this->execute('behat_general::i_press_named_key', ['', 'tab']);
+        $this->execute([self::class, 'i_click_on'], [$node, 'NodeElement']);
+        $this->execute([self::class, 'i_press_named_key'], ['', 'tab']);
     }
 
     /**
-     * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, oracle, etc.)
+     * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, etc.)
      *
      * @Given /^database family used is one of the following:$/
      * @param TableNode $databasefamilies list of database.
@@ -2265,9 +2285,9 @@ EOF;
      */
     public function i_manually_press_tab($shift = '') {
         if (empty($shift)) {
-            $this->execute('behat_general::i_press_named_key', ['', 'tab']);
+            $this->execute([self::class, 'i_press_named_key'], ['', 'tab']);
         } else {
-            $this->execute('behat_general::i_press_named_key', ['shift', 'tab']);
+            $this->execute([self::class, 'i_press_named_key'], ['shift', 'tab']);
         }
     }
 
@@ -2363,7 +2383,7 @@ EOF;
      * @throws DriverException
      */
     public function i_manually_press_enter() {
-        $this->execute('behat_general::i_press_named_key', ['', 'enter']);
+        $this->execute([self::class, 'i_press_named_key'], ['', 'enter']);
     }
 
     /**
@@ -2398,7 +2418,7 @@ EOF;
      */
     public function i_click_on_the_dynamic_tab(string $tabname): void {
         $xpath = "//*[@id='dynamictabs-tabs'][descendant::a[contains(text(), '" . $this->escape($tabname) . "')]]";
-        $this->execute('behat_general::i_click_on_in_the',
+        $this->execute([self::class, 'i_click_on_in_the'],
             [$tabname, 'link', $xpath, 'xpath_element']);
     }
 
@@ -2448,7 +2468,7 @@ EOF;
         }
 
         // Make the provided editor the default one in $CFG->texteditors by
-        // moving it to the first [editor],atto,tiny,textarea on the list.
+        // moving it to the first [editor],tiny,textarea on the list.
         $list = explode(',', $CFG->texteditors);
         array_unshift($list, $editor);
         $list = array_unique($list);
@@ -2549,9 +2569,9 @@ EOF;
         // Update the state of the switch.
         $field = $node->getAttribute('id');
         if ($state == "on") {
-            $this->execute('behat_forms::i_set_the_field_to', [$field, 1]);
+            $this->execute([behat_forms::class, 'i_set_the_field_to'], [$field, 1]);
         } else if ($state == "off") {
-            $this->execute('behat_forms::i_set_the_field_to', [$field, 0]);
+            $this->execute([behat_forms::class, 'i_set_the_field_to'], [$field, 0]);
         } else {
             throw new \Behat\Mink\Exception\ExpectationException('Invalid state for switch: ' . $state, $this->getSession());
         }
@@ -2585,7 +2605,7 @@ EOF;
      * @throws coding_exception
      */
     private function get_combobox_dropdown_node(string $comboboxname, string $itemname, bool $fieldset = true): NodeElement {
-        $this->execute("behat_general::wait_until_the_page_is_ready");
+        $this->execute([self::class, 'wait_until_the_page_is_ready']);
 
         $comboboxxpath = "//div[contains(@class, 'comboboxsearch') and .//span[text()='{$comboboxname}']]";
         $dropdowntriggerxpath = $comboboxxpath . "/descendant::div[contains(@class,'dropdown-toggle')]";
@@ -2594,12 +2614,12 @@ EOF;
 
         // If the dropdown is not visible, open it. Also, ensure that a dropdown trigger element exists.
         if ($this->getSession()->getPage()->find('xpath', $dropdowntriggerxpath) && !$dropdown->isVisible()) {
-            $this->execute("behat_general::i_click_on", [$dropdowntriggerxpath, "xpath_element"]);
+            $this->execute([self::class, 'i_click_on'], [$dropdowntriggerxpath, "xpath_element"]);
         }
 
         if ($fieldset) {
-            $this->execute("behat_forms::set_field_value", [$comboboxname, $itemname]);
-            $this->execute("behat_general::wait_until_exists", [$itemname, "list_item"]);
+            $this->execute([behat_forms::class, 'set_field_value'], [$comboboxname, $itemname]);
+            $this->execute([self::class, 'wait_until_exists'], [$itemname, "list_item"]);
         }
 
         return $dropdown;
@@ -2619,7 +2639,7 @@ EOF;
      * @param string $comboboxname The name (label) of the search combo box element. (e.g. "Search users", "Search groups").
      */
     public function i_confirm_in_search_combobox_exists(string $itemname, string $comboboxname): void {
-        $this->execute("behat_general::assert_element_contains_text",
+        $this->execute([self::class, 'assert_element_contains_text'],
             [$itemname, $this->get_combobox_dropdown_node($comboboxname, $itemname, false), "NodeElement"]);
     }
 
@@ -2637,7 +2657,7 @@ EOF;
      * @param string $comboboxname The name (label) of the search combo box element. (e.g. "Search users", "Search groups").
      */
     public function i_confirm_in_search_combobox_does_not_exist(string $itemname, string $comboboxname): void {
-        $this->execute("behat_general::assert_element_not_contains_text",
+        $this->execute([self::class, 'assert_element_not_contains_text'],
             [$itemname, $this->get_combobox_dropdown_node($comboboxname, $itemname, false), "NodeElement"]);
     }
 
@@ -2656,11 +2676,11 @@ EOF;
      */
     public function i_click_on_in_search_combobox(string $itemname, string $comboboxname): void {
         $node = $this->get_combobox_dropdown_node($comboboxname, $itemname);
-        $this->execute('behat_general::i_click_on_in_the', [
+        $this->execute([self::class, 'i_click_on_in_the'], [
             $itemname, "list_item",
             $node, "NodeElement",
         ]);
-        $this->execute("behat_general::i_wait_to_be_redirected");
+        $this->execute([self::class, 'i_wait_to_be_redirected']);
     }
 
     /**

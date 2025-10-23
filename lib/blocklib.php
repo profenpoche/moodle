@@ -245,18 +245,18 @@ class block_manager {
      * @return boolean - is there one of these blocks in the current page?
      */
     public function is_block_present($blockname) {
-        if (empty($this->blockinstances)) {
+        if (empty($this->birecordsbyregion)) {
             return false;
         }
 
         $requiredbythemeblocks = $this->get_required_by_theme_block_types();
-        foreach ($this->blockinstances as $region) {
+        foreach ($this->birecordsbyregion as $region) {
             foreach ($region as $instance) {
-                if (empty($instance->instance->blockname)) {
+                if (empty($instance->blockname)) {
                     continue;
                 }
-                if ($instance->instance->blockname == $blockname) {
-                    if ($instance->instance->requiredbytheme) {
+                if ($instance->blockname == $blockname) {
+                    if ($instance->requiredbytheme) {
                         if (!in_array($blockname, $requiredbythemeblocks)) {
                             continue;
                         }
@@ -832,6 +832,14 @@ class block_manager {
 
         if (empty($pagetypepattern)) {
             $pagetypepattern = $this->page->pagetype;
+        }
+
+        if (!empty($this->birecordsbyregion)) {
+            $addableblocks = $this->get_addable_blocks();
+
+            if (!array_key_exists($blockname, $addableblocks)) {
+                throw new moodle_exception('blockcannotadd');
+            }
         }
 
         $blockinstance = new stdClass;
@@ -1447,7 +1455,29 @@ class block_manager {
                 'bui_confirm' => 1,
                 'sesskey' => sesskey(),
             ]);
-            $blocktitle = $block->get_title();
+
+            $deleteblockmessage = json_encode(['deleteblockcheck', 'block', $blocktitle]);
+
+            // If the block is being shown in sub contexts display a warning.
+            if ($block->instance->showinsubcontexts == 1) {
+                $parentcontext = context::instance_by_id($block->instance->parentcontextid);
+                $systemcontext = context_system::instance();
+                $messagestring = new stdClass();
+                $messagestring->location = $parentcontext->get_context_name();
+
+                // Checking for blocks that may have visibility on the front page and pages added on that.
+                if ($parentcontext->id != $systemcontext->id && is_inside_frontpage($parentcontext)) {
+                    $messagestring->pagetype = get_string('showonfrontpageandsubs', 'block');
+                } else {
+                    $pagetypes = generate_page_type_patterns($this->page->pagetype, $parentcontext);
+                    $messagestring->pagetype = $block->instance->pagetypepattern;
+                    if (isset($pagetypes[$block->instance->pagetypepattern])) {
+                        $messagestring->pagetype = $pagetypes[$block->instance->pagetypepattern];
+                    }
+                }
+
+                $deleteblockmessage = json_encode(['deleteblockwarning', 'block', $messagestring]);
+            }
 
             $controls[] = new action_menu_link_secondary(
                 $deleteactionurl,
@@ -1457,7 +1487,7 @@ class block_manager {
                     'class' => 'editing_delete',
                     'data-modal' => 'confirmation',
                     'data-modal-title-str' => json_encode(['deletecheck_modal', 'block']),
-                    'data-modal-content-str' => json_encode(['deleteblockcheck', 'block', $blocktitle]),
+                    'data-modal-content-str' => $deleteblockmessage,
                     'data-modal-yes-button-str' => json_encode(['delete', 'core']),
                     'data-modal-toast' => 'true',
                     'data-modal-toast-confirmation-str' => json_encode(['deleteblockinprogress', 'block', $blocktitle]),
